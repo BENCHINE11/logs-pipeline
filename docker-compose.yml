@@ -50,7 +50,9 @@ services:
     networks: [ bdnet ]
 
   spark:
-    image: apache/spark:3.5.1
+    build:
+      context: .
+      dockerfile: spark/Dockerfile
     container_name: spark
     user: "0"
     depends_on: [ kafka, namenode, datanode ]
@@ -70,7 +72,7 @@ services:
       - CHECKPOINT=hdfs://namenode:8020/datalake/logs/_chk/curated
     command: [ "bash", "-lc", "sleep infinity" ]
     ports:
-      - "4040:4040"   # Spark UI (quand un job tourne)
+      - "4040:4040"
     networks: [ bdnet ]
 
   airflow:
@@ -102,7 +104,27 @@ services:
     working_dir: /app
     volumes:
       - ./producer:/app
-    command: [ "bash", "-lc", "pip install -r requirements.txt && python produce_logs.py" ]
+    command:
+      - bash
+      - -lc
+      - |
+        pip install -r requirements.txt
+        python - <<'PY'
+        import os, time
+        from kafka import KafkaProducer
+        bootstrap=os.getenv("KAFKA_BOOTSTRAP","kafka:9092")
+        for i in range(60):
+            try:
+                KafkaProducer(bootstrap_servers=bootstrap).close()
+                print("Kafka is READY:", bootstrap)
+                break
+            except Exception as e:
+                print("Waiting for Kafka...", e)
+                time.sleep(2)
+        else:
+            raise SystemExit("Kafka not ready after 120s")
+        PY
+        python produce_logs.py
     environment:
       - KAFKA_BOOTSTRAP=kafka:9092
       - KAFKA_TOPIC=logs_raw
