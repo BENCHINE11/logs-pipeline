@@ -1,0 +1,110 @@
+services:
+  kafka:
+    image: bitnami/kafka:3.7
+    container_name: kafka
+    environment:
+      - KAFKA_ENABLE_KRAFT=yes
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=false
+    ports:
+      - "9092:9092"
+    networks: [ bdnet ]
+
+  namenode:
+    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+    container_name: namenode
+    environment:
+      - CLUSTER_NAME=bd
+    ports:
+      - "9870:9870"
+      - "8020:8020"
+    volumes:
+      - namenode:/hadoop/dfs/name
+    networks: [ bdnet ]
+
+  datanode:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    container_name: datanode
+    environment:
+      - CLUSTER_NAME=bd
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:8020
+    depends_on: [ namenode ]
+    ports:
+      - "9864:9864"
+    volumes:
+      - datanode:/hadoop/dfs/data
+    networks: [ bdnet ]
+
+  spark:
+    image: apache/spark:3.5.1
+    container_name: spark
+    user: "0"
+    depends_on: [ kafka, namenode, datanode ]
+    working_dir: /app
+    volumes:
+      - ./spark-streaming:/app/spark-streaming
+      - ./spark-batch:/app/spark-batch
+      - ./sql:/app/sql
+      - ./.cs-cache:/root/.cache/coursier
+      - ./.sbt-cache:/root/.sbt
+      - ./.ivy-cache:/root/.ivy2
+      - ./.ivy-cache:/home/spark/.ivy2
+    environment:
+      - KAFKA_BOOTSTRAP=kafka:9092
+      - KAFKA_TOPIC=logs_raw
+      - HDFS_OUT=hdfs://namenode:8020/datalake/logs/curated
+      - CHECKPOINT=hdfs://namenode:8020/datalake/logs/_chk/curated
+    command: [ "bash", "-lc", "sleep infinity" ]
+    ports:
+      - "4040:4040"   # Spark UI (quand un job tourne)
+    networks: [ bdnet ]
+
+  airflow:
+    image: apache/airflow:2.9.3
+    container_name: airflow
+    depends_on: [ spark ]
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////opt/airflow/airflow.db
+      - AIRFLOW__CORE__LOAD_EXAMPLES=false
+      - AIRFLOW__WEBSERVER__EXPOSE_CONFIG=true
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+    ports:
+      - "8080:8080"
+    command: >
+      bash -lc "
+      airflow db init &&
+      airflow users create --username admin --password admin --firstname admin --lastname admin --role Admin --email admin@example.com || true &&
+      airflow webserver -p 8080 &
+      airflow scheduler
+      "
+    networks: [ bdnet ]
+
+  producer:
+    image: python:3.11-slim
+    container_name: producer
+    depends_on: [ kafka ]
+    working_dir: /app
+    volumes:
+      - ./producer:/app
+    command: [ "bash", "-lc", "pip install -r requirements.txt && python produce_logs.py" ]
+    environment:
+      - KAFKA_BOOTSTRAP=kafka:9092
+      - KAFKA_TOPIC=logs_raw
+      - RATE=150
+    networks: [ bdnet ]
+
+networks:
+  bdnet:
+
+volumes:
+  namenode:
+  datanode:
