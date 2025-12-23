@@ -10,4 +10,8 @@
 [0m[[0m[0mdebug[0m] [0m[0m	  /app/spark-batch/target/scala-2.12/classes/com/myapp/logs/BatchAggJob$.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	com/myapp/logs/BatchAggJob.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	  /app/spark-batch/target/scala-2.12/classes/com/myapp/logs/BatchAggJob.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	com/myapp/logs/BatchAnalytics$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /app/spark-batch/target/scala-2.12/classes/com/myapp/logs/BatchAnalytics$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	com/myapp/logs/BatchAnalytics.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /app/spark-batch/target/scala-2.12/classes/com/myapp/logs/BatchAnalytics.class[0m
 [0m[[0m[0mdebug[0m] [0m[0mDone packaging.[0m
