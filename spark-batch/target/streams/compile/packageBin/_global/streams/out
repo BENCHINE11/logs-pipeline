@@ -1,0 +1,13 @@
+[0m[[0m[0mdebug[0m] [0m[0mPackaging /app/spark-batch/target/scala-2.12/logs-batch_2.12-0.1.0.jar ...[0m
+[0m[[0m[0mdebug[0m] [0m[0mInput file mappings:[0m
+[0m[[0m[0mdebug[0m] [0m[0m	com[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /app/spark-batch/target/scala-2.12/classes/com[0m
+[0m[[0m[0mdebug[0m] [0m[0m	com/myapp[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /app/spark-batch/target/scala-2.12/classes/com/myapp[0m
+[0m[[0m[0mdebug[0m] [0m[0m	com/myapp/logs[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /app/spark-batch/target/scala-2.12/classes/com/myapp/logs[0m
+[0m[[0m[0mdebug[0m] [0m[0m	com/myapp/logs/BatchAggJob$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /app/spark-batch/target/scala-2.12/classes/com/myapp/logs/BatchAggJob$.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	com/myapp/logs/BatchAggJob.class[0m
+[0m[[0m[0mdebug[0m] [0m[0m	  /app/spark-batch/target/scala-2.12/classes/com/myapp/logs/BatchAggJob.class[0m
+[0m[[0m[0mdebug[0m] [0m[0mDone packaging.[0m
