@@ -7,6 +7,4 @@
 [0m[[0m[0mdebug[0m] [0m[0mRegistering generated classes:[0m
 [0m[[0m[0mdebug[0m] [0m[0m	BatchAnalytics$.class[0m
 [0m[[0m[0mdebug[0m] [0m[0m	BatchAnalytics.class[0m
-[0m[[0m[0mdebug[0m] [0m[0m	BatchAggJob.class[0m
-[0m[[0m[0mdebug[0m] [0m[0m	BatchAggJob$.class[0m
 [0m[[0m[0mdebug[0m] [0m[0mRemoving the temporary directory used for backing up class files: /app/spark-batch/target/scala-2.12/classes.bak[0m

@@ -15,11 +15,14 @@ services:
     depends_on: [ zookeeper ]
     ports:
       - "9092:9092"
+      - "29092:29092"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
     networks: [ bdnet ]
@@ -129,6 +132,21 @@ services:
       - KAFKA_BOOTSTRAP=kafka:9092
       - KAFKA_TOPIC=logs_raw
       - RATE=150
+    networks: [ bdnet ]
+
+  dashboard:
+    image: python:3.11-slim
+    container_name: dashboard
+    working_dir: /app
+    volumes:
+      - ./dashboard:/app
+      - ./analytics_local:/data/analytics
+    ports:
+      - "8501:8501"
+    command: >
+      bash -lc "pip install -r requirements.txt &&
+                streamlit run streamlit_app.py --server.address=0.0.0.0 --server.port=8501"
+    depends_on: [ namenode ]
     networks: [ bdnet ]
 
 networks:
