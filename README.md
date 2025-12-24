@@ -1,4 +1,9 @@
 # 📘 Logs Pipeline – Big Data / Data Engineering
+Vous trouverez le rapport et la présentation PPT de ce projet dans le dossier :
+- `/docs/rapport`
+- `/docs/présentation`
+
+---
 ## 📌 Description du projet
 
 Ce projet met en œuvre un pipeline Big Data complet pour le traitement et l’analyse de logs applicatifs en temps réel et en batch.
